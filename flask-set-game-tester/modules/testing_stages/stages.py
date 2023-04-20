@@ -29,7 +29,7 @@ def process_ip_stage(ip: str, port: str):
         "=" * 100 + "<br><br>",
 
     ]
-
+    # Checks if this stage was failed one or more times 
     has_ip_fails = False
     with open(file_name, "r") as f:
         lines = [line + "<br>" for line in f]
@@ -40,6 +40,7 @@ def process_ip_stage(ip: str, port: str):
                 break
     Path(file_name).unlink()
     continue_status = True
+    # If the test case(s) was/were failed
     if has_ip_fails:
         link = modules.connection_utils.connection_utils.IP_TESTS_FAILED
         file_data += [f'<br><img src="{link}"><br>',
