@@ -5,6 +5,11 @@ app = Flask(__name__)
 
 
 @app.route('/')
+@app.route('/form')
+@app.route('/tester')
+@app.route('/settester')
+@app.route('/setclient')
+@app.route('/test')
 def form():
     return render_template('form.html')
 
