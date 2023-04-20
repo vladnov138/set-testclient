@@ -10,7 +10,7 @@ def check_response(resp, **kwargs):
 	for key in kwargs:
 		assert key in resp
 		if kwargs[key] is not None:
-			assert resp[key]==kwargs[key]
+			assert resp[key] == kwargs[key]
 
 def test_register():
 	nick = "vanka"
