@@ -1,11 +1,14 @@
 import random
 
+#TODO create constants module
+
 SERVER_IP = "127.0.0.1"
 
 MODE_GLOBAL = 1
 MODE_LOCAL = 0
 MODE = MODE_GLOBAL
 
+#TODO: add more memes
 LOCALHOST_MEMES = [
     "https://i.ibb.co/J2nTYF0/1.jpg",
     "https://i.ibb.co/hZKGY3f/2.jpg",
@@ -18,12 +21,15 @@ LOCALHOST_MEMES = [
 
 IP_TESTS_FAILED = "https://www.meme-arsenal.com/memes/526c27ae2deb49e11536fc09999d2042.jpg"
 
+
 def get_server_ip():
+    """Returns actual test server IP"""
     global SERVER_IP
     return SERVER_IP
 
 
 def set_server_ip(ip: str):
+    """Sets IP of the test server"""
     global SERVER_IP
     SERVER_IP = ip
 
