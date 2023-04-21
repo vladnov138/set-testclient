@@ -1,6 +1,6 @@
 import requests
 # url = "https://postman-echo.com/post"
-url = "http://127.0.0.1:5000"
+url = ""
 token = ""
 gameId = 0
 def send_request(route,**kwargs):
