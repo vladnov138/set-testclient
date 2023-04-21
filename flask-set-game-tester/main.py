@@ -1,15 +1,14 @@
-from modules.testing_stages.stages import process_ip_stage
+from modules.testing_stages.stages import process_all
+from modules.connection_utils.connection_utils import set_full_ip
+from modules.connection_utils.connection_utils import set_server_mode
+from modules.connection_utils.connection_utils import set_room_mode
 from flask import Flask, render_template, request, redirect, url_for
+from modules.connection_utils.connection_utils import MODE
 
 app = Flask(__name__)
 
 
 @app.route('/')
-@app.route('/form')
-@app.route('/tester')
-@app.route('/settester')
-@app.route('/setclient')
-@app.route('/test')
 def form():
     return render_template('form.html')
 
@@ -18,7 +17,12 @@ def form():
 def run_test():
     input_data = request.form['input_data']
     input_port = request.form['input_port']
-    result, status = process_ip_stage(input_data, input_port)
+
+    server_mode = 1 if request.form['mode'] == 'global' else 0
+    room_mode = 1 if request.form['room'] == 'multiple' else 0
+
+    set_full_ip(input_data, input_port)
+    result = process_all(input_data, input_port, server_mode, room_mode)
     return result
 
 

@@ -1,14 +1,21 @@
+import uuid
+
+import requests
 import random
 
-#TODO create constants module
-
 SERVER_IP = "127.0.0.1"
+SERVER_IP_FULL = "http://127.0.0.1:4567"
 
 MODE_GLOBAL = 1
 MODE_LOCAL = 0
-MODE = MODE_GLOBAL
+MODE = MODE_LOCAL
 
-#TODO: add more memes
+ROOM_SINGLE = 0
+ROOM_MULTIPLE = 1
+ROOM_MODE = ROOM_SINGLE
+
+TOKEN = "qwerty"
+
 LOCALHOST_MEMES = [
     "https://i.ibb.co/J2nTYF0/1.jpg",
     "https://i.ibb.co/hZKGY3f/2.jpg",
@@ -20,18 +27,35 @@ LOCALHOST_MEMES = [
 ]
 
 IP_TESTS_FAILED = "https://www.meme-arsenal.com/memes/526c27ae2deb49e11536fc09999d2042.jpg"
+TEST_USER_NAME = ""
 
 
 def get_server_ip():
-    """Returns actual test server IP"""
     global SERVER_IP
     return SERVER_IP
 
 
 def set_server_ip(ip: str):
-    """Sets IP of the test server"""
     global SERVER_IP
     SERVER_IP = ip
+
+
+def set_full_ip(ip: str, port: str):
+    global SERVER_IP_FULL
+    SERVER_IP_FULL = "http://" + ip + ":" + port
+
+
+def get_full_ip():
+    return SERVER_IP_FULL
+
+
+def get_test_user_name():
+    return "testuser_" + str(uuid.uuid4())
+
+
+def set_test_user_name(username: str):
+    global TEST_USER_NAME
+    TEST_USER_NAME = username
 
 
 def is_ip_online(ip_address="127.0.0.1", port=80):
@@ -63,3 +87,26 @@ def is_localhost(ip: str):
 def get_random_localhost_meme():
     """Returns link to the random localhost meme"""
     return random.choice(LOCALHOST_MEMES)
+
+
+def send_request(route, **kwargs):
+    return requests.post(get_full_ip() + route, json=kwargs, headers={"Content-type": "application/json"}).json()
+
+
+def set_server_mode(mode: int):
+    global MODE
+    MODE = mode
+
+
+def set_room_mode(mode: int):
+    global ROOM_MODE
+    ROOM_MODE = mode
+
+
+def set_token(token: str):
+    global TOKEN
+    TOKEN = token
+
+
+def get_token():
+    return TOKEN
