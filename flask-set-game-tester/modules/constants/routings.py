@@ -1,2 +1,2 @@
 R_REGISTER = "/user/register"
-R_AUTH = "/user/auth"
+R_AUTH = "/user/login"

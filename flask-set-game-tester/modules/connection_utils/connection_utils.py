@@ -27,7 +27,6 @@ LOCALHOST_MEMES = [
 ]
 
 IP_TESTS_FAILED = "https://www.meme-arsenal.com/memes/526c27ae2deb49e11536fc09999d2042.jpg"
-TEST_USER_NAME = ""
 
 
 def get_server_ip():
@@ -47,15 +46,6 @@ def set_full_ip(ip: str, port: str):
 
 def get_full_ip():
     return SERVER_IP_FULL
-
-
-def get_test_user_name():
-    return "testuser_" + str(uuid.uuid4())
-
-
-def set_test_user_name(username: str):
-    global TEST_USER_NAME
-    TEST_USER_NAME = username
 
 
 def is_ip_online(ip_address="127.0.0.1", port=80):
