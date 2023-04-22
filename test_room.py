@@ -3,7 +3,6 @@ from functions import *
 
 
 # TODO check token
-# TODO Проверка вида карты
 def test_creating_room():
     leave()
     res = create_room()
@@ -14,35 +13,55 @@ def test_creating_room():
     leave()
 
 
-# TODO add new user
 def test_list_room():
     leave()
-    res = send_request('/set/room/list', accessToken=token)
+    res = get_gamelist()
     check_response(res, success=True, exception=None, games=None)
     assert len(res['games']) >= 0
 
 
-def test_joining_room():
+def test_cards():
     leave()
-    res = register("Ivan_Sergeevich", "PipecGU")
-    check_response(res, success=True, exception=None, accessToken=None)
-    second_token = res['accessToken']
+    create_room()
+    res = get_field()
+    check_response(res, success=True, exception=None, fieldCards=None)
+    card = res['fieldCards'][11]
+    check_response(card, count=None, color=None, fill=None, shape=None)
+
+
+def test_room():
+    leave()
+    leave(token=token2)
+
+    res = get_gamelist(token=token2)
+    check_response(res, success=True, exception=None, games=None)
+    count_games = len(res['games'])
 
     game_id = create_room()['gameId']
-    res = send_request('/set/room/enter', accessToken=second_token, gameId=game_id)
-    check_response(res, success=True, exception=None)
 
-    res = leave(access_token=second_token)
+    res = get_gamelist(token=token2)
+    check_response(res, success=True, exception=None, games=None)
+    new_count_games = len(res['games'])
+
+    assert new_count_games > count_games
+    count_games = new_count_games
+
+    res = send_request('/set/room/enter', accessToken=token2, gameId=game_id)
+    print(res)
+    check_response(res, success=True, exception=None, gameId=None)
+
+    res = leave(token=token2)
     check_response(res, success=True, exception=None)
-    res = leave(access_token=second_token)
+    res = leave(token=token2)
     check_response(res, success=False, exception=None)
     res = leave()
     check_response(res, success=True, exception=None)
 
+    res = get_gamelist(token=token2)
+    check_response(res, success=True, exception=None, games=None)
+    new_count_games = len(res['games'])
 
-
-def test_leaving_room():
-    pass
+    assert new_count_games < count_games
 
 
 def test_field():
@@ -52,7 +71,8 @@ def test_field():
 
     create_room()
     res = get_field()
-    check_response(res, success=True, exception=None, fieldCards=None, scores=None, status='ongoing')
+    print(res)
+    check_response(res, success=True, exception=None, fieldCards=None, status='ongoing')
     cards = res['fieldCards']
     assert len(cards) == 12
     leave()
@@ -78,7 +98,6 @@ def test_add():
 
 
 def test_pick():
-    # TODO score
     leave()
     res = pick([1, 2, 3])
     check_response(res, success=False, exception=None)
@@ -86,36 +105,49 @@ def test_pick():
     create_room()
     res = get_field()
     cards = res['fieldCards']
-    old_scores = res['score']
     chosen_cards = select_three_cards(cards)
+    while len(chosen_cards) == 0:
+        add_cards()
+        cards = res['fieldCards']
+        chosen_cards = select_three_cards(cards)
     res = pick(chosen_cards)
     check_response(res, success=True, exception=None, isSet=True)
     new_res = get_field()
-    new_scores = new_res['score']
     new_len = len(new_res['fieldCards'])
 
-    assert new_len >= 12 and new_len <= 21 # TODO ?
-    assert new_scores > old_scores
+    assert 12 <= new_len <= 21
 
     res = pick(chosen_cards)
     check_response(res, success=False, exception=None)
 
     cards = get_field()['fieldCards']
-    old_scores = new_scores
     chosen_cards = select_three_cards(cards, set=False)
     res = pick(chosen_cards)
     check_response(res, success=True, exception=None, isSet=False)
-    assert old_scores <= res['scores']
     leave()
+
+
+def test_score():
+    leave()
+    create_room()
+    res = send_request('/set/score', accessToken=token1)
+    print(res)
+    check_response(res, success=True, exception=None, users=None)
+    old_score = res['users'][0]['score']
+    cards = get_field()['fieldCards']
+    pick(select_three_cards(cards))
+    res = send_request('/set/score', accessToken=token1)
+    check_response(res, success=True, exception=None, users=None)
+    new_score = res['users'][0]['score']
+    assert new_score > old_score
 
 
 def test_imitate_game():
     leave()
     create_room()
     out_cards = 0
-    res = {}
     status = 'ongoing'
-    cards = get_field()['cards']
+    cards = get_field()['fieldCards']
     while out_cards < 81 and status == 'ongoing':
         chosen_cards = select_three_cards(cards, set=False)
         res = pick(chosen_cards)
@@ -123,14 +155,15 @@ def test_imitate_game():
 
         chosen_cards = select_three_cards(cards)
         while len(chosen_cards) == 0:
-            cards = add_cards()
+            add_cards()
+            cards = get_field()['fieldCards']
             chosen_cards = select_three_cards(cards)
         res = pick(chosen_cards)
         check_response(res, success=True, exception=None, isSet=True)
 
-        # status = res['status'] TODO ?
-        cards = get_field()['cards']
+        status = get_field()['status']
+        cards = get_field()['fieldCards']
         out_cards += 3
-    assert res['status'] == 'ended' and out_cards > 60
+    assert status == 'ended' and out_cards > 60
     leave()
 

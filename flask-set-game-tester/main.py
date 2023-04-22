@@ -1,9 +1,6 @@
 from modules.testing_stages.stages import process_all
 from modules.connection_utils.connection_utils import set_full_ip
-from modules.connection_utils.connection_utils import set_server_mode
-from modules.connection_utils.connection_utils import set_room_mode
-from flask import Flask, render_template, request, redirect, url_for
-from modules.connection_utils.connection_utils import MODE
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 

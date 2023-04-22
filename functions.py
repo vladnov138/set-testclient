@@ -1,8 +1,28 @@
 from itertools import permutations
 import requests
 
-from test_main import token, url
 from main import PROPERTIES
+
+url = ""
+token1 = ""
+token2 = ""
+gameId = 0
+
+def test_register():
+    res = register("vanka", '242424')
+    print(res)
+    check_response(res, success=True, exception=None, accessToken=None, nickname=None)
+    global token1
+    token1 = res["accessToken"]
+
+    res = register("Ivan_Sergeevich", 'PipecGU')
+    check_response(res, success=True, exception=None, accessToken=None, nickname=None)
+    global token2
+    token2 = res["accessToken"]
+
+
+def get_gamelist(token=token1):
+    return send_request('/set/room/list', accessToken=token)
 
 
 def send_request(route: str, **kwargs) -> dict:
@@ -34,10 +54,10 @@ def register(nickname: str, password: str) -> dict:
     :param password: user's password
     :return: request result
     '''
-    return send_request("/user/login", nickname=nickname, password=password)
+    return send_request("/user/register", nickname=nickname, password=password)
 
 
-def add_cards() -> dict:
+def add_cards(token=token1) -> dict:
     '''
     Adds 3 cards to the field
     :return: request result
@@ -45,7 +65,7 @@ def add_cards() -> dict:
     return send_request('/set/add', accessToken=token)
 
 
-def get_field() -> dict:
+def get_field(token=token1) -> dict:
     '''
     Gets field
     :return: request result
@@ -53,7 +73,7 @@ def get_field() -> dict:
     return send_request('/set/field', accessToken=token)
 
 
-def pick(chosen_cards) -> dict:
+def pick(chosen_cards, token=token1) -> dict:
     '''
     Picks chosen cards and checks it for set
     :param chosen_cards: list of three chosen cards
@@ -62,7 +82,7 @@ def pick(chosen_cards) -> dict:
     return send_request('/set/pick', accessToken=token, cards=chosen_cards)
 
 
-def create_room() -> dict:
+def create_room(token=token1) -> dict:
     '''
     Creating a room
     :return: request result
@@ -70,12 +90,12 @@ def create_room() -> dict:
     return send_request('/set/room/create', accessToken=token)
 
 
-def leave(access_token=token) -> dict:
+def leave(token=token1) -> dict:
     '''
     Leaving the room
     :return: request result
     '''
-    return send_request('/set/room/leave', accessToken=access_token)
+    return send_request('/set/room/leave', accessToken=token)
 
 
 def select_three_cards(cards: list, set=True) -> list:
