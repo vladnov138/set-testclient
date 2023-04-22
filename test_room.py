@@ -1,146 +1,136 @@
-from itertools import permutations
-
-from main import PROPERTIES
 from test_main import *
+from functions import *
 
 
 # TODO check token
 # TODO Проверка вида карты
 def test_creating_room():
-    send_request('/set/room/leave', accessToken=token)
-    res = send_request('/set/room/create', accessToken=token)
+    leave()
+    res = create_room()
     check_response(res, success=True, exception=None, gameId=None)
 
-    res = send_request('/set/room/create', accessToken=token)
+    res = create_room()
     check_response(res, success=False, exception=None)
+    leave()
 
-    send_request('/set/room/leave', accessToken=token)
 
+# TODO add new user
 def test_list_room():
-    pass
+    leave()
+    res = send_request('/set/room/list', accessToken=token)
+    check_response(res, success=True, exception=None, games=None)
+    assert len(res['games']) >= 0
+
 
 def test_joining_room():
-    # TODO Регистрация нового юзера и присоединение к комнате
-    pass
+    leave()
+    res = register("Ivan_Sergeevich", "PipecGU")
+    check_response(res, success=True, exception=None, accessToken=None)
+    second_token = res['accessToken']
+
+    game_id = create_room()['gameId']
+    res = send_request('/set/room/enter', accessToken=second_token, gameId=game_id)
+    check_response(res, success=True, exception=None)
+
+    res = leave(access_token=second_token)
+    check_response(res, success=True, exception=None)
+    res = leave(access_token=second_token)
+    check_response(res, success=False, exception=None)
+    res = leave()
+    check_response(res, success=True, exception=None)
+
+
 
 def test_leaving_room():
-    # TODO Выход с обоих юзеров
     pass
 
 
 def test_field():
-    send_request('/set/room/leave', accessToken=token)
-    res = send_request('/set/field', accessToken=token)
+    leave()
+    res = get_field()
     check_response(res, success=False, exception=None)
 
-    send_request('/set/room/create', accessToken=token)
-    res = send_request('/set/field', accessToken=token)
+    create_room()
+    res = get_field()
     check_response(res, success=True, exception=None, fieldCards=None, scores=None, status='ongoing')
     cards = res['fieldCards']
     assert len(cards) == 12
-    send_request('/set/room/leave', accessToken=token)
+    leave()
 
 
 def test_add():
-    send_request('/set/room/leave', accessToken=token)
-    res = send_request('/set/add', accessToken=token)
+    leave()
+    res = add_cards()
     check_response(res, success=False, exception=None)
 
-    send_request('/set/room/create', accessToken=token)
-    cards = send_request('/set/field', accessToken=token)['fieldCards']
+    create_room()
+    cards = get_field()['fieldCards']
     cur_len = len(cards)
     while cur_len < 21:
-        res = send_request('/set/add', accessToken=token)
+        res = add_cards()
         check_response(res, success=True, exception=None)
-        cur_cards = send_request('/set/field', accessToken=token)['fieldCards']
+        cur_cards = get_field()['fieldCards']
         cur_len += 3
         assert cur_len == len(cur_cards)
-    res = send_request('/set/add', accessToken=token)
+    res = add_cards()
     check_response(res, success=False, exception=None)
-    send_request('/set/room/leave', accessToken=token)
+    leave()
 
 
 def test_pick():
     # TODO score
-    send_request('/set/room/leave', accessToken=token)
-    res = send_request('/set/pick', accessToken=token, cards=[1, 2, 3])
+    leave()
+    res = pick([1, 2, 3])
     check_response(res, success=False, exception=None)
 
-    send_request('/set/room/create', accessToken=token)
-    res = send_request('/set/field', accessToken=token)
+    create_room()
+    res = get_field()
     cards = res['fieldCards']
     old_scores = res['score']
     chosen_cards = select_three_cards(cards)
-    res = send_request('/set/pick', accessToken=token, cards=chosen_cards)
-    print(res)
+    res = pick(chosen_cards)
     check_response(res, success=True, exception=None, isSet=True)
-    new_res = send_request('/set/field', accessToken=token)
+    new_res = get_field()
     new_scores = new_res['score']
     new_len = len(new_res['fieldCards'])
 
     assert new_len >= 12 and new_len <= 21 # TODO ?
     assert new_scores > old_scores
 
-    res = send_request('/set/pick', accessToken=token, cards=chosen_cards)
+    res = pick(chosen_cards)
     check_response(res, success=False, exception=None)
 
-    cards = send_request('/set/field', accessToken=token)['fieldCards']
+    cards = get_field()['fieldCards']
     old_scores = new_scores
     chosen_cards = select_three_cards(cards, set=False)
-    res = send_request('/set/pick', accessToken=token, cards=chosen_cards)
+    res = pick(chosen_cards)
     check_response(res, success=True, exception=None, isSet=False)
     assert old_scores <= res['scores']
-    send_request('/set/room/leave', accessToken=token)
+    leave()
 
 
 def test_imitate_game():
-    send_request('/set/room/leave', accessToken=token)
-    send_request('/set/room/create', accessToken=token)
+    leave()
+    create_room()
     out_cards = 0
     res = {}
     status = 'ongoing'
-    cards = send_request('/set/field', accessToken=token)['cards']
+    cards = get_field()['cards']
     while out_cards < 81 and status == 'ongoing':
         chosen_cards = select_three_cards(cards, set=False)
-        res = send_request('/set/pick', accessToken=token, cards=chosen_cards)
-        check_response(res, success=True, exception=None, isSet=False, status=None)
+        res = pick(chosen_cards)
+        check_response(res, success=True, exception=None, isSet=False)
 
         chosen_cards = select_three_cards(cards)
         while len(chosen_cards) == 0:
-            cards = send_request('/set/add', accessToken=token)
+            cards = add_cards()
             chosen_cards = select_three_cards(cards)
-        res = send_request('/set/pick', accessToken=token, cards=chosen_cards)
-        check_response(res, success=True, exception=None, isSet=True, status=None)
-        status = res['status']
-        cards = send_request('set/field', accessToken=token)['cards']
+        res = pick(chosen_cards)
+        check_response(res, success=True, exception=None, isSet=True)
+
+        # status = res['status'] TODO ?
+        cards = get_field()['cards']
         out_cards += 3
     assert res['status'] == 'ended' and out_cards > 60
-
-
-def select_three_cards(cards: list, set=True) -> list:
-    '''
-    Selects three cards and returns a list of it \n
-    :param cards: list of cards on the field
-    :param set: choose set cards
-    :return: list of three cards or empty list
-    '''
-    for chosen_cards in permutations(cards, 3):
-        set_cards = [chosen_cards[0], chosen_cards[1], chosen_cards[2]]
-        if is_set(set_cards) and set or not (is_set(set_cards) or set):
-            return [chosen_cards[0]['id'], chosen_cards[1]['id'], chosen_cards[2]['id']]
-    return []
-
-
-def is_set(cards: list) -> bool:
-    '''
-    Checks chosen cards if it's set
-    :param cards: list of three cards
-    :return: true if it's set
-    '''
-    for prop in PROPERTIES:
-        if not ((cards[0][prop] == cards[1][prop] and cards[1][prop] == cards[2][prop]) or
-            (cards[0][prop] != cards[1][prop] and cards[1][prop] != cards[2][prop] and
-             cards[0][prop] != cards[2][prop])):
-            return False
-    return True
+    leave()
 
