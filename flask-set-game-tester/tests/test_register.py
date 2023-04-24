@@ -5,11 +5,13 @@ from modules.connection_utils.connection_utils import get_full_ip
 from modules.connection_utils.connection_utils import send_request
 from modules.constants.routings import R_REGISTER
 from modules.connection_utils.connection_utils import set_token
-from modules.connection_utils.connection_utils import get_token
 import json
 
 
-with open("userdata_1.json", "r") as f:
+USER1_FILE = "userdata_1.json"
+USER2_FILE = "userdata_2.json"
+
+with open(USER1_FILE, "r") as f:
     data = json.load(f)
 
 
@@ -40,15 +42,16 @@ def test_repeated_register():
 
 
 def test_register_extra_user():
-    with open("userdata_2.json", "r") as f:
+    with open(USER2_FILE, "r") as f:
         user_data = json.load(f)
         c_name = user_data["nickname"]
         c_password = "qwerty"
         response = send_request(R_REGISTER, nickname=c_name, password=c_password)
     assert response["success"]
     assert response["accessToken"] is not None
-    with open('userdata_2.json', "r+") as f:
+    with open(USER2_FILE, "r+") as f:
         dictionary = json.load(f)
         dictionary["token"] = response["accessToken"]
+        print(dictionary)
         f.seek(0)
         json.dump(dictionary, f)

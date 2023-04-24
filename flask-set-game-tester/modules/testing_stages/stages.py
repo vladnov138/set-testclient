@@ -25,21 +25,11 @@ def process_ip_stage(ip: str, port: str, mode: int):
     file_name = str(uuid.uuid4()) + ".log"
     init_tests_cmd = f"pytest tests/test_ip.py > {file_name}"
     subprocess.call(init_tests_cmd, shell=True)
-    file_data = [
-        "=" * 100 + "<br><br>",
-        "<h3>IP Init Tests</h3>",
-        f"SERVER IP: {ip}<br>",
-        f"SERVER PORT: {port}<br>",
-        f"TESTS LOGS: {file_name} <br>",
-        f"TEST STARTED AT: {datetime.now().strftime('%H:%M:%S')}<br>",
-        f"CURRENT STAGE: INPUT IP TEST <br><br>",
-        "=" * 100 + "<br><br>",
-    ]
+    file_data = []
 
     has_ip_fails = False
     with open(file_name, "r") as f:
         lines = [line + "<br>" for line in f]
-        file_data += lines
         for i in lines:
             if "FAILURES" in i:
                 has_ip_fails = True
@@ -47,18 +37,16 @@ def process_ip_stage(ip: str, port: str, mode: int):
     Path(file_name).unlink()
     if has_ip_fails:
         link = modules.connection_utils.connection_utils.IP_TESTS_FAILED
-        file_data += [f'<br><img src="{link}"><br>',
-                      "<h2>У вас ошибка связанная с IP адресом, дальнейшее тестирование не будет проведено!</h2>"]
+        file_data += ['<h2 class="failure">IP TEST STATUS: FAILED! </h2>',
+                      f'<br><img src="{link}"><br>',]
     else:
-        file_data.append("<h2>Ip stage status: SUCCESS!</h2>")
+        file_data.append('<h2 class="success">IP TEST STATUS: SUCCESS!</h2>')
     return file_data, not has_ip_fails
 
 
 def process_register_stage():
     """Tests for the registration function"""
-    result = ["<br><br><br>" + "=" * 100,
-              "<br><br><h3> Registration Tests </h3><br><br>",
-              "=" * 100]
+    result = []
     file_name = str(uuid.uuid4()) + ".log"
 
     test_name = "test_user_" + str(uuid.uuid4())
@@ -74,36 +62,32 @@ def process_register_stage():
     has_register_fails = False
     with open(file_name, "r") as f:
         lines = [line + "<br>" for line in f]
-        result += lines
         for i in lines:
             if "FAILURES" in i:
                 has_register_fails = True
-                result.append('<h2>У вас ошибки в блоке "Регистрация"! Дальнейшее тестирование проведено не будет! ')
+                result.append('<h2 class="failure">REGISTRATION TEST STATUS: FAILED!</h2>')
                 break
     if not has_register_fails:
-        result.append("<h3>Register Stage Status: SUCCESS!</h3>")
+        result.append('<h2 class="success">REGISTRATION TEST STATUS: SUCCESS!</h2>')
     Path(file_name).unlink()
     return result, not has_register_fails
 
 
 def process_auth_stage():
-    result = ["<br><br><br>" + "=" * 100,
-              "<br><br><h3> Authorization Tests </h3><br><br>",
-              "=" * 100]
+    result = []
     file_name = str(uuid.uuid4()) + ".log"
     init_tests_cmd = f"pytest tests/test_auth.py > {file_name}"
     subprocess.call(init_tests_cmd, shell=True)
     has_register_fails = False
     with open(file_name, "r") as f:
         lines = [line + "<br>" for line in f]
-        result += lines
         for i in lines:
             if "FAILURES" in i:
                 has_register_fails = True
-                result.append('<h2>У вас ошибки в блоке "Авторизация"! Дальнейшее тестирование проведено не будет! ')
+                result.append('<h2 class="failure">AUTH TESTS STATUS: FAILED!<h2>')
                 break
     if not has_register_fails:
-        result.append("<h3>Authorization Stage Status: SUCCESS!</h3>")
+        result.append('<h2 class="success">AUTH TESTS STATUS: SUCCESS!</h2>')
     Path(file_name).unlink()
     return result, not has_register_fails
 
