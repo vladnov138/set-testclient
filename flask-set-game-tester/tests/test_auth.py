@@ -4,7 +4,7 @@ import modules.connection_utils.connection_utils
 from modules.connection_utils.connection_utils import send_request
 from modules.constants.routings import R_AUTH
 
-with open("currentdata.json", "r") as f:
+with open("userdata_2.json", "r") as f:
     data = json.load(f)
 
 name = data["nickname"]

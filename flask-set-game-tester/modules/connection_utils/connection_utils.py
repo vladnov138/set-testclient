@@ -1,5 +1,4 @@
 import uuid
-
 import requests
 import random
 
@@ -98,5 +97,86 @@ def set_token(token: str):
     TOKEN = token
 
 
-def get_token():
-    return TOKEN
+def get_gamelist(token: str):
+    return send_request('/set/room/list', accessToken=token)
+
+
+def add_cards(token: str) -> dict:
+    """
+    Adds 3 cards to the field
+    :return: request result
+    """
+    return send_request('/set/add', accessToken=token)
+
+
+def get_field(token: str) -> dict:
+    """
+    Gets field
+    :return: request result
+    """
+    return send_request('/set/field', accessToken=token)
+
+
+def pick(chosen_cards, token: str) -> dict:
+    """
+    Picks chosen cards and checks it for set
+    :param chosen_cards: list of three chosen cards
+    :return: request result
+    """
+    return send_request('/set/pick', accessToken=token, cards=chosen_cards)
+
+
+def create_room(token: str) -> dict:
+    """
+    Creating a room
+    :return: request result
+    """
+    return send_request('/set/room/create', accessToken=token)
+
+
+def leave(token: str) -> dict:
+    """
+    Leaving the room
+    :return: request result
+    """
+    return send_request('/set/room/leave', accessToken=token)
+
+
+def select_three_cards(cards: list, set=True) -> list:
+    """
+    Selects three cards and returns a list of it \n
+    :param cards: list of cards on the field
+    :param set: choose set cards
+    :return: list of three cards or empty list
+    """
+    for chosen_cards in permutations(cards, 3):
+        set_cards = [chosen_cards[0], chosen_cards[1], chosen_cards[2]]
+        if is_set(set_cards) and set or not (is_set(set_cards) or set):
+            return [chosen_cards[0]['id'], chosen_cards[1]['id'], chosen_cards[2]['id']]
+    return []
+
+
+def is_set(cards: list) -> bool:
+    """
+    Checks chosen cards if it's set
+    :param cards: list of three cards
+    :return: true if it's set
+    """
+    for prop in PROPERTIES:
+        if not ((cards[0][prop] == cards[1][prop] and cards[1][prop] == cards[2][prop]) or
+                (cards[0][prop] != cards[1][prop] and cards[1][prop] != cards[2][prop] and
+                 cards[0][prop] != cards[2][prop])):
+            return False
+    return True
+
+
+def check_response(resp: dict, **kwargs) -> None:
+    """
+    Checks fields in the response
+    :param resp: request response
+    :param kwargs: necessary fields
+    """
+    for key in kwargs:
+        assert key in resp
+        if kwargs[key] is not None:
+            assert resp[key] == kwargs[key]

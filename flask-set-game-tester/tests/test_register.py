@@ -9,7 +9,7 @@ from modules.connection_utils.connection_utils import get_token
 import json
 
 
-with open("currentdata.json", "r") as f:
+with open("userdata_1.json", "r") as f:
     data = json.load(f)
 
 
@@ -24,7 +24,7 @@ def test_initial_register():
     response = send_request(R_REGISTER, nickname=test_name, password=password)
     assert response["success"]
     assert response["accessToken"] is not None
-    with open('currentdata.json', "r+") as f:
+    with open('userdata_1.json', "r+") as f:
         dictionary = json.load(f)
         dictionary["token"] = response["accessToken"]
         f.seek(0)
@@ -37,3 +37,18 @@ def test_repeated_register():
     assert not response["success"]
     assert response["exception"] is not None
     assert response["exception"]["message"] is not None
+
+
+def test_register_extra_user():
+    with open("userdata_2.json", "r") as f:
+        user_data = json.load(f)
+        c_name = user_data["nickname"]
+        c_password = "qwerty"
+        response = send_request(R_REGISTER, nickname=c_name, password=c_password)
+    assert response["success"]
+    assert response["accessToken"] is not None
+    with open('userdata_2.json', "r+") as f:
+        dictionary = json.load(f)
+        dictionary["token"] = response["accessToken"]
+        f.seek(0)
+        json.dump(dictionary, f)

@@ -63,9 +63,12 @@ def process_register_stage():
 
     test_name = "test_user_" + str(uuid.uuid4())
     data = {"nickname": test_name, "password": "qwerty"}
-    with open("currentdata.json", "w") as f:
+    data_extra = {"nickname": test_name + "_buddy", "password": "qwerty"}
+    with open("userdata_1.json", "w") as f:
         json.dump(data, f)
 
+    with open("userdata_2.json", "w") as f:
+        json.dump(data_extra, f)
     init_tests_cmd = f"pytest tests/test_register.py > {file_name}"
     subprocess.call(init_tests_cmd, shell=True)
     has_register_fails = False
