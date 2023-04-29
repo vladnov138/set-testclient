@@ -79,6 +79,7 @@ def get_random_localhost_meme():
 
 
 def send_request(route, **kwargs):
+    print(get_full_ip() + route)
     return requests.post(get_full_ip() + route, json=kwargs, headers={"Content-type": "application/json"}).json()
 
 

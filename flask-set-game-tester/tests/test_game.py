@@ -1,4 +1,6 @@
 import json
+
+import main
 from modules.connection_utils.connection_utils import leave
 from modules.connection_utils.connection_utils import create_room
 from modules.connection_utils.connection_utils import get_gamelist
@@ -8,9 +10,10 @@ from modules.connection_utils.connection_utils import pick
 from modules.connection_utils.connection_utils import select_three_cards
 from modules.connection_utils.connection_utils import is_set
 from modules.connection_utils.connection_utils import check_response
+from modules.connection_utils.connection_utils import send_request
 
-USER_FILE_ONE = '../userdata_1.json'
-USER_FILE_TWO = '../userdata_2.json'
+USER_FILE_ONE = main.ROOT_DIR + '/userdata_1.json'
+USER_FILE_TWO = main.ROOT_DIR + '/userdata_2.json'
 
 
 def get_userdata_fjson(jsonfile: str):

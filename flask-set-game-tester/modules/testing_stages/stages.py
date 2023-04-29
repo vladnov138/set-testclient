@@ -69,7 +69,7 @@ def process_register_stage():
                 break
     if not has_register_fails:
         result.append('<h2 class="success">REGISTRATION TEST STATUS: SUCCESS!</h2>')
-    Path(file_name).unlink()
+    #Path(file_name).unlink()
     return result, not has_register_fails
 
 
@@ -88,7 +88,7 @@ def process_auth_stage():
                 break
     if not has_register_fails:
         result.append('<h2 class="success">AUTH TESTS STATUS: SUCCESS!</h2>')
-    Path(file_name).unlink()
+    #Path(file_name).unlink()
     return result, not has_register_fails
 
 
@@ -108,7 +108,7 @@ def process_game_stage():
     if not has_game_fails:
         result.append('<h2 class="success">GAME TESTS STATUS: SUCCESS!</h2>')
         result.append("ALL TESTS WERE SUCCESSFULLY PASSED! CONGRATULATIONS!")
-    Path(file_name).unlink()
+    #Path(file_name).unlink()
     return result, not has_game_fails
 
 

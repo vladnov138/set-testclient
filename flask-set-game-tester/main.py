@@ -1,9 +1,10 @@
 from modules.testing_stages.stages import process_all
 from modules.connection_utils.connection_utils import set_full_ip
 from flask import Flask, render_template, request
+import os
 
 app = Flask(__name__)
-
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 @app.route('/')
 def form():
