@@ -38,7 +38,7 @@ def process_ip_stage(ip: str, port: str, mode: int):
     if has_ip_fails:
         link = modules.connection_utils.connection_utils.IP_TESTS_FAILED
         file_data += ['<h2 class="failure">IP TEST STATUS: FAILED! </h2>',
-                      f'<br><img src="{link}"><br>',]
+                      f'<br><img src="{link}"><br>', ]
     else:
         file_data.append('<h2 class="success">IP TEST STATUS: SUCCESS!</h2>')
     return file_data, not has_ip_fails
@@ -92,12 +92,35 @@ def process_auth_stage():
     return result, not has_register_fails
 
 
+def process_game_stage():
+    result = []
+    file_name = str(uuid.uuid4()) + ".log"
+    init_tests_cmd = f"pytest tests/test_game.py > {file_name}"
+    subprocess.call(init_tests_cmd, shell=True)
+    has_game_fails = False
+    with open(file_name, "r") as f:
+        lines = [line + "<br>" for line in f]
+        for i in lines:
+            if "FAILURES" in i:
+                has_game_fails = True
+                result.append('<h2 class="failure">GAME TESTS STATUS: FAILED!<h2>')
+                break
+    if not has_game_fails:
+        result.append('<h2 class="success">GAME TESTS STATUS: SUCCESS!</h2>')
+        result.append("ALL TESTS WERE SUCCESSFULLY PASSED! CONGRATULATIONS!")
+    Path(file_name).unlink()
+    return result, not has_game_fails
+
+
 def process_all(ip: str, port: str, server_mode: int, room_mode: int):
     init_result, continue_status = process_ip_stage(ip, port, server_mode)
     if continue_status:
         register_result, continue_status = process_register_stage()
         if continue_status:
             auth_result, continue_status = process_auth_stage()
+            if continue_status:
+                game_result, continue_status = process_game_stage()
+                return "".join(register_result + auth_result + game_result)
             return "".join(init_result + register_result + auth_result)
         return "".join(init_result + register_result)
     return init_result
