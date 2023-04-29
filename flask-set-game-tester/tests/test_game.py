@@ -66,7 +66,6 @@ def test_room():
     count_games = new_count_games
 
     res = send_request('/set/room/enter', accessToken=USER2_TOKEN, gameId=game_id)
-    print(res)
     check_response(res, success=True, exception=None, gameId=None)
 
     res = leave(token=USER2_TOKEN)
@@ -116,7 +115,7 @@ def test_add():
 
 def test_pick():
     leave(USER1_TOKEN)
-    res = pick([1, 2, 3])
+    res = pick([1, 2, 3], USER1_TOKEN)
     check_response(res, success=False, exception=None)
 
     create_room(USER1_TOKEN)
