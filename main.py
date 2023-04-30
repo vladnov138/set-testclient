@@ -1,12 +1,30 @@
-import requests
+from modules.testing_stages.stages import process_all
+from modules.connection_utils.connection_utils import set_full_ip
+from modules.connection_utils.connection_utils import get_full_ip
+from flask import Flask, render_template, request
+import os
+
+app = Flask(__name__)
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+@app.route('/')
+def form():
+    return render_template('form.html')
 
 
-url = "http://127.0.0.1:8000"
-TOKEN = "MVIAHAbMJz8qJ0oPITsY3yO18orUMWYiM0hP7XtKVGAWDUVH4hbxNHaNqbDH"
-PROPERTIES = ['color', 'count', 'shape', 'fill']
-cards = []
+@app.route('/run_test', methods=['POST'])
+def run_test():
+    input_data = request.form['input_data']
+    input_port = request.form['input_port']
 
-def send_request(**kwargs):
-	return requests.post(url, json = kwargs, headers={"Content-type":"application/json"}).json()
+    server_mode = 1 if request.form['mode'] == 'global' else 0
+    room_mode = 1 if request.form['room'] == 'multiple' else 0
 
-# print(send_request(hi=5,test=True))
+    set_full_ip(input_data, input_port)
+    print(f"CURRENT IP ADDRESS : {get_full_ip()}")
+    result = process_all(input_data, input_port, server_mode, room_mode)
+    return result
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
