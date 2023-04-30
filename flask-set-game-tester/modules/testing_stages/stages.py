@@ -117,10 +117,9 @@ def process_all(ip: str, port: str, server_mode: int, room_mode: int):
     if continue_status:
         register_result, continue_status = process_register_stage()
         if continue_status:
-            auth_result, continue_status = process_auth_stage()
-            if continue_status:
-                game_result, continue_status = process_game_stage()
-                return "".join(register_result + auth_result + game_result)
-            return "".join(init_result + register_result + auth_result)
+            #auth_result, continue_status = process_auth_stage()
+            #if continue_status:
+            game_result, continue_status = process_game_stage()
+            return "".join(register_result + game_result)
         return "".join(init_result + register_result)
     return init_result

@@ -34,12 +34,19 @@ def test_initial_register():
     assert response["nickname"] == test_name
 
 
+def test_wrong_password():
+    response = send_request(R_REGISTER, nickname=test_name, password="123")
+    assert not response["success"]
+
+
+"""
+Удалён, тк кто-то решил, что вешать и авторизацию и регистрацию на один роутинг будет ахуенной идеей
 def test_repeated_register():
     response = send_request(R_REGISTER, nickname=test_name, password=password)
     assert not response["success"]
     assert response["exception"] is not None
     assert response["exception"]["message"] is not None
-
+"""
 
 def test_register_extra_user():
     with open(USER2_FILE, "r") as f:

@@ -1,10 +1,10 @@
 import uuid
 import requests
 import random
-
+from itertools import permutations
 SERVER_IP = "127.0.0.1"
 SERVER_IP_FULL = "http://127.0.0.1:4567"
-
+PROPERTIES = ['color', 'count', 'shape', 'fill']
 MODE_GLOBAL = 1
 MODE_LOCAL = 0
 MODE = MODE_LOCAL
@@ -80,7 +80,7 @@ def get_random_localhost_meme():
 
 def send_request(route, **kwargs):
     print(get_full_ip() + route)
-    return requests.post(get_full_ip() + route, json=kwargs, headers={"Content-type": "application/json"}).json()
+    return requests.post("http://84.252.142.21:8080/api" + route, json=kwargs, headers={"Content-type": "application/json"}).json()
 
 
 def set_server_mode(mode: int):

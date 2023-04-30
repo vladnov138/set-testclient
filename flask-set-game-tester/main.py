@@ -1,5 +1,6 @@
 from modules.testing_stages.stages import process_all
 from modules.connection_utils.connection_utils import set_full_ip
+from modules.connection_utils.connection_utils import get_full_ip
 from flask import Flask, render_template, request
 import os
 
@@ -20,6 +21,7 @@ def run_test():
     room_mode = 1 if request.form['room'] == 'multiple' else 0
 
     set_full_ip(input_data, input_port)
+    print(f"CURRENT IP ADDRESS : {get_full_ip()}")
     result = process_all(input_data, input_port, server_mode, room_mode)
     return result
 
