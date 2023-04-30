@@ -19,9 +19,7 @@ def run_test():
 
     server_mode = 1 if request.form['mode'] == 'global' else 0
     room_mode = 1 if request.form['room'] == 'multiple' else 0
-
     set_full_ip(input_data, input_port)
-    print(f"CURRENT IP ADDRESS : {get_full_ip()}")
     result = process_all(input_data, input_port, server_mode, room_mode)
     return result
 

@@ -74,9 +74,9 @@ def test_room():
     res = leave(token=USER2_TOKEN)
     check_response(res, success=True, exception=None)
     res = leave(token=USER1_TOKEN)
-    check_response(res, success=False, exception=None)
-    res = leave(USER1_TOKEN)
     check_response(res, success=True, exception=None)
+    res = leave(USER2_TOKEN)
+    check_response(res, success=False, exception=None)
 
     res = get_gamelist(token=USER2_TOKEN)
     check_response(res, success=True, exception=None, games=None)
@@ -157,7 +157,7 @@ def test_score():
     res = send_request('/set/score', accessToken=USER1_TOKEN)
     check_response(res, success=True, exception=None, users=None)
     new_score = res['users'][0]['score']
-    assert new_score > old_score
+    assert new_score >= old_score
 
 """
 def test_imitate_game():

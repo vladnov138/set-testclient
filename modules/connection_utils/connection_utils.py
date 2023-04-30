@@ -1,7 +1,9 @@
 import uuid
 import requests
 import random
+import json
 from itertools import permutations
+
 SERVER_IP = "127.0.0.1"
 SERVER_IP_FULL = "http://127.0.0.1:4567"
 PROPERTIES = ['color', 'count', 'shape', 'fill']
@@ -28,6 +30,7 @@ LOCALHOST_MEMES = [
 IP_TESTS_FAILED = "https://www.meme-arsenal.com/memes/526c27ae2deb49e11536fc09999d2042.jpg"
 
 
+
 def get_server_ip():
     global SERVER_IP
     return SERVER_IP
@@ -39,13 +42,15 @@ def set_server_ip(ip: str):
 
 
 def set_full_ip(ip: str, port: str):
-    global SERVER_IP_FULL
-    SERVER_IP_FULL = "http://" + ip + ":" + port
+    with open("serveraddress.json", "w") as f:
+        data = {"address": "http://" + ip + ":" + port}
+        json.dump(data, f)
 
 
 def get_full_ip():
-    return SERVER_IP_FULL
-
+    with open("serveraddress.json", "r") as f:
+        data = json.load(f)
+    return data["address"]
 
 def is_ip_online(ip_address="127.0.0.1", port=80):
     """Checks if IP is online"""
@@ -80,7 +85,8 @@ def get_random_localhost_meme():
 
 def send_request(route, **kwargs):
     print(get_full_ip() + route)
-    return requests.post("http://84.252.142.21:8080/api" + route, json=kwargs, headers={"Content-type": "application/json"}).json()
+    return requests.post(get_full_ip() + route, json=kwargs,
+                         headers={"Content-type": "application/json"}).json()
 
 
 def set_server_mode(mode: int):

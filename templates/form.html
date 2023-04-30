@@ -4,6 +4,52 @@
       <meta charset="UTF-8">
       <title>Тестирование сервера игры SET</title>
    </head>
+   <style>
+   body {
+  background-color: #1a1a1a;
+  color: #fff;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  color: green;
+  font-size: 2.5em;
+}
+
+form {
+  margin: 30px auto;
+  padding: 20px;
+  background-color: #333;
+  border-radius: 10px;
+}
+
+label {
+  display: block;
+  margin: 10px 0;
+}
+
+input[type="text"], input[type="radio"] {
+  border: none;
+  background-color: #1a1a1a;
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+input[type="submit"] {
+  background-color: green;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+input[type="submit"]:hover {
+  background-color: #006400;
+}
+
+   </style>
    <body>
       <h1>Тестер для сервера игры SET</h1>
       <form method="post" action="{{ url_for('run_test') }}">
